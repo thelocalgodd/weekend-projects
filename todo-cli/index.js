@@ -1,13 +1,14 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { connect, model } from "mongoose";
+import mongoose from "mongoose";
 import inquirer from "inquirer";
 import chalk from "chalk";
 import clear from "clear";
 import taskModel from "./model/taskSchema.js";
 
-connect(process.env.MONGO_URI);
-const tasks = model("tasks", taskModel);
+mongoose.connect(process.env.MONGO_URI);
+
+const tasks = mongoose.model("tasks", taskModel);
 
 clear();
 
@@ -16,7 +17,6 @@ clear();
 get all tasks
 create task
 update task status
-update task name
 delete task
 */
 
@@ -28,9 +28,12 @@ const viewTasks = async () => {
     console.log(
       chalk.green(task.id) +
         chalk.yellow(" " + task.task) +
-        chalk.red(" " + task.status_)
+        { complete: chalk.green, incomplete: chalk.red }[task.status_](
+          " " + task.status_
+        )
     );
   });
+  console.log("\n");
   mainMenu();
 };
 
@@ -52,6 +55,7 @@ const createTask = () => {
       });
 
       (await newTask.save()) && console.log(chalk.blue("Task created!"));
+      console.log("\n");
       mainMenu();
     });
 };
@@ -76,10 +80,11 @@ const updateTaskStatus = async () => {
         choices: ["complete", "incomplete"],
       },
     ])
-    .then(async (answer) => {
-      const task = await tasks.findOne({ id: answer.task });
+    .then((answer) => {
+      const task = tasks.findOne({ id: answer.task });
       task.status_ = answer.status;
-      (await task.save()) && console.log(chalk.blue("Task updated!"));
+      (task.save() && console.log(chalk.blue("Task updated!")));
+      console.log("\n");
       mainMenu();
     });
 };
@@ -98,9 +103,13 @@ const deleteTask = async () => {
         ),
       },
     ])
-    .then(async (answer) => {
-      const task = await tasks.findOne({ id: answer.task });
-      (await task.deleteOne()) && console.log(chalk.blue("Task deleted!"));
+    .then((answer) => {
+      // const task = tasks.findOne({ id: answer.task.id });
+      // console.log(task)
+      tasks.findOneAndDelete({
+        id: parseInt(answer.task.split(" ")[0]),
+      }) && console.log(chalk.blue("Task deleted!"));
+      console.log("\n");
       mainMenu();
     });
 };
@@ -123,10 +132,10 @@ const mainMenu = () => {
     ])
     .then((answer) => {
       switch (answer.mainMenu) {
-        case "View Tasks":
+        case "View All Tasks":
           viewTasks();
           break;
-        case "Create Task":
+        case "Create New Task":
           createTask();
           break;
         case "Update Task Status":
@@ -136,9 +145,12 @@ const mainMenu = () => {
           deleteTask();
           break;
         case "Exit":
-          console.log(chalk.blue("Goodbye!"));
+          console.log(
+            chalk.blue("Goodbye! | Created by ") +
+              chalk.bgBlueBright("thelocalgodd") +
+              " ^_~"
+          );
           process.exit();
-          break;
       }
     });
 };
