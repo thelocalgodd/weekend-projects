@@ -8,7 +8,7 @@ import taskModel from "./model/taskSchema.js";
 
 mongoose.connect(process.env.MONGO_URI);
 
-const tasks = mongoose.model("tasks", taskModel);
+const tasks = mongoose.model("Tasks", taskModel);
 
 clear();
 
@@ -26,7 +26,6 @@ const viewTasks = async () => {
   console.log(chalk.blue("Tasks:"));
   taskList.forEach((task) => {
     console.log(
-      chalk.green(task.id) +
         chalk.yellow(" " + task.task) +
         { complete: chalk.green, incomplete: chalk.red }[task.status_](
           " " + task.status_
@@ -47,9 +46,7 @@ const createTask = () => {
       },
     ])
     .then(async (answer) => {
-      const taskCount = await tasks.countDocuments();
       const newTask = new tasks({
-        id: taskCount + 1,
         task: answer.task,
         status_: "incomplete",
       });
@@ -70,7 +67,7 @@ const updateTaskStatus = async () => {
         name: "task",
         message: "Select task:",
         choices: taskList.map(
-          (task) => task.id + " " + task.task + " " + task.status_
+          (task) => task.task + " " + task.status_
         ),
       },
       {
@@ -81,9 +78,13 @@ const updateTaskStatus = async () => {
       },
     ])
     .then((answer) => {
-      const task = tasks.findOne({ id: answer.task });
+      const task = tasks.findOne({ 
+        task: answer.list,
+       });
       task.status_ = answer.status;
-      (task.save() && console.log(chalk.blue("Task updated!")));
+      (task.updateOne({
+        
+      }) && console.log(chalk.blue("Task updated!")));
       console.log("\n");
       mainMenu();
     });
@@ -99,15 +100,13 @@ const deleteTask = async () => {
         name: "task",
         message: "Select task:",
         choices: taskList.map(
-          (task) => task.id + " " + task.task + " " + task.status_
+          (task) => task.task + " " + task.status_
         ),
       },
     ])
     .then((answer) => {
-      // const task = tasks.findOne({ id: answer.task.id });
-      // console.log(task)
       tasks.findOneAndDelete({
-        id: parseInt(answer.task.split(" ")[0]),
+        "task": answer.task
       }) && console.log(chalk.blue("Task deleted!"));
       console.log("\n");
       mainMenu();
