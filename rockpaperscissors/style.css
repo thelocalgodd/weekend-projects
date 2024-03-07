@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+* a:link {
+  text-decoration: none;
+  color: black;
+}
+* a:link:hover {
+  color: red;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#container {
+  display: flex;
+  border: 1px solid black;
+  margin-top: 10px;
+  flex-direction: column;
+  width: 80vh;
+  height: 50vh;
+  align-items: center;
+}
+#container #header {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 20px;
+  font-size: 25px;
+}
+#container #play {
+  font-size: 18px;
+  margin-top: 5px;
+}
+#container #play span {
+  background-color: grey;
+}
+#container #input {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+}
+#container #input #input-box {
+  width: 150px;
+  padding-left: 5px;
+  height: 35px;
+  margin-right: 5px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+#container #input #submit-button {
+  border: 1px solid black;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-radius: 5px;
+  color: white;
+  background-color: black;
+}
+#container #options {
+  display: flex;
+  font-size: 50px;
+  margin-top: 30px;
+}
+#container #result {
+  margin-top: 10px;
+}
+#container #result span {
+  background-color: grey;
+}
+
+/*# sourceMappingURL=style.css.map */
