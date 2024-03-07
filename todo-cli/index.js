@@ -23,6 +23,10 @@ delete task
 const viewTasks = async () => {
   const taskList = await tasks.find({});
 
+  if (taskList.length === 0) {
+    console.log(chalk.yellow("No tasks found. Create a new task :)\n"));
+    mainMenu();
+  } else {
   console.log(chalk.blue("Tasks:"));
   taskList.forEach((task) => {
     console.log(
@@ -34,6 +38,7 @@ const viewTasks = async () => {
   });
   console.log("\n");
   mainMenu();
+      }
 };
 
 const createTask = () => {
@@ -78,14 +83,13 @@ const updateTaskStatus = async () => {
         choices: ["complete", "incomplete"],
       },
     ])
-    .then((answer) => {
-      const task = tasks.findOne({ 
-        task: answer.list,
+    .then(async (answer) => {
+      const task = await tasks.findOne({ 
+        task: answer.task.split(' ')[0],
        });
       task.status_ = answer.status;
-      (task.updateOne({
-        
-      }) && console.log(chalk.blue("Task updated!")));
+      await task.save();
+      console.log(chalk.blue("Task updated!"));
       console.log("\n");
       mainMenu();
     });
@@ -105,10 +109,12 @@ const deleteTask = async () => {
         ),
       },
     ])
-    .then((answer) => {
-      tasks.findOneAndDelete({
-        "task": answer.task
-      }) && console.log(chalk.blue("Task deleted!"));
+    .then(async (answer) => {
+      const taskName = answer.task.split(' ')[0];
+      await tasks.findOneAndDelete({
+        task: taskName
+      });
+      console.log(chalk.blue("Task deleted!"));
       console.log("\n");
       mainMenu();
     });
